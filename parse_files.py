@@ -6,7 +6,7 @@ from track import Track
 def parse_txt_file(file_path: str) -> List[Track]:
     tracks = []
     
-    with open(file_path, "r", encoding="utf-8") as csvfile:
+    with open(file_path, "r", encoding="utf-16") as csvfile:
         csvreader = csv.reader(csvfile, delimiter="\t")
         next(csvreader)  # Skip header line
         
@@ -14,11 +14,12 @@ def parse_txt_file(file_path: str) -> List[Track]:
             index = int(row[0])
             title = row[2]
             artist = row[3]
-            genre = row[4]
-            bpm = float(row[5].replace(",", "."))
-            rating = len(row[6].strip()) if row[6].strip() else 0
-            duration = int(row[7][:2]) * 60 + int(row[7][-2:])  # Convert duration to seconds
-            key = row[8]
+            album = row[4]
+            genre = row[5]
+            bpm = float(row[6].replace(",", "."))
+            rating = len(row[7].strip()) if row[7].strip() else 0
+            duration = int(row[8][:2]) * 60 + int(row[8][-2:])  # Convert duration to seconds
+            key = row[9]
             added_date = row[10]
             bit_depth = int(row[11])
 

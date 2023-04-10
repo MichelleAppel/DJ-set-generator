@@ -3,7 +3,7 @@ def export_to_m3u8(output_file, dj_set, track_paths):
         f.write('#EXTM3U\n')
         for track in dj_set:
             track_info = f"{track.artist} - {track.title}"
-            track_duration = int(track.duration.total_seconds())
-            track_path = track_paths[track]
+            track_duration = int(track.duration)
+            track_path = track_paths[track.index-1]
             f.write(f'#EXTINF:{track_duration},{track_info}\n')
             f.write(f'{track_path}\n')
