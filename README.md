@@ -39,4 +39,4 @@ Replace `/path/to/playlist.txt`, `/path/to/playlist.m3u8`, and `/path/to/output.
 
 ## License
 
-MIT License.
+MIT License. See `LICENSE` for more information.
