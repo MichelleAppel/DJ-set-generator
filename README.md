@@ -18,46 +18,24 @@ DJ Set Generator is a Python tool for creating DJ sets from Rekordbox playlists.
 
 ## Usage
 
-1.  Clone the repository:
+1.  Clone the repository.
     
-     ```bash
-     git clone https://github.com/MichelleAppel/AI_set.git 
-     cd AI_set
-     ```
+```bash
+git clone https://github.com/yourusername/dj-set-generator.git cd dj-set-generator
+```
     
--   Prepare the input files:
+2. Prepare a Rekordbox playlist exported as a .txt file and a corresponding .m3u8 file.
     
-    -   Place the original .m3u8 playlist file in a folder of your choice.
-    -   Create a .txt file containing the list of track indices, one per line, that you want to include in the new playlist.
--   Run the script:
+3. Run the `main.py` script with the appropriate command line arguments:
     
-     ```bash
-     python playlist_generator.py --root_folder /path/to/your/folder --indices_file indices.txt
-     ```
-    
+```bash
+python main.py --playlist_txt_path /path/to/playlist.txt --playlist_m3u8_path /path/to/playlist.m3u8 --output_file /path/to/output.m3u8 --set_length 10 --min_rating 3 --algorithm greedy
+```
+
 Replace `/path/to/playlist.txt`, `/path/to/playlist.m3u8`, and `/path/to/output.m3u8` with the appropriate file paths, and adjust the `set_length`, `min_rating`, and `algorithm` arguments as desired. Available algorithms are `greedy`, `dynamic`, `genetic`, and `simulated_annealing`.
     
-    This will generate a new .m3u8 file in the same folder as the original .m3u8 file, with a name based on the indices file (e.g., `indices_playlist.m3u8`).
-    
-
-## Example
-
-Suppose you have the following file structure:
-
-```markdown
-my_sets/
-    original_playlist.m3u8
-    track_indices.txt
-```
-
-Run the script with the following command:
-
-```bash
-python playlist_generator.py --root_folder my_sets --indices_file track_indices.txt
-```
-
-This will generate a new .m3u8 file named `track_indices_playlist.m3u8` in the `my_sets` folder.
+4. Import the generated M3U8 playlist into Rekordbox.
 
 ## License
 
-MIT License. See `LICENSE` for more information.
+MIT License. See `LICENSE` for more details.
