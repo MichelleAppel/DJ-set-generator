@@ -21,7 +21,7 @@ DJ Set Generator is a Python tool for creating DJ sets from Rekordbox playlists.
 1.  Clone the repository.
     
 ```bash
-git clone https://github.com/yourusername/dj-set-generator.git cd dj-set-generator
+git clone https://github.com/MichelleAppel/DJ_set_generator.git cd dj-set-generator
 ```
     
 2. Prepare a Rekordbox playlist exported as a .txt file and a corresponding .m3u8 file.
