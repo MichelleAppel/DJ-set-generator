@@ -1,6 +1,8 @@
 import random
 import math
 
+from tqdm import tqdm
+
 def build_dj_set(tracks, set_length, min_rating, algorithm):
     algorithms = {
         "greedy": build_dj_set_greedy,
@@ -65,7 +67,7 @@ def build_dj_set_dynamic(tracks, set_length, min_rating):
         rating_score = track.rating if track.rating >= prioritized_rating else 0
         return key_bpm_score + rating_score
 
-    def dynamic_dj_set(prev_track, remaining_tracks, remaining_length):
+    def dynamic_dj_set(prev_track, remaining_tracks, remaining_length, pbar):
         if remaining_length == 0:
             return []
 
@@ -79,7 +81,7 @@ def build_dj_set_dynamic(tracks, set_length, min_rating):
 
         for track in remaining_tracks:
             score = track_score(track, prev_track)
-            next_dj_set = dynamic_dj_set(track, remaining_tracks - {track}, remaining_length - 1)
+            next_dj_set = dynamic_dj_set(track, remaining_tracks - {track}, remaining_length - 1, pbar)
             total_score = score + sum(track_score(next_track, prev_track) for prev_track, next_track in zip([track] + next_dj_set[:-1], next_dj_set))
 
             if total_score > max_score:
@@ -89,12 +91,15 @@ def build_dj_set_dynamic(tracks, set_length, min_rating):
 
         best_dj_set = [best_next_track] + best_next_dj_set
         memo[memo_key] = best_dj_set
+        pbar.update(1)
         return best_dj_set
 
     first_track = random.choice(tracks)
     remaining_tracks = set(tracks) - {first_track}
-    dj_set = [first_track] + dynamic_dj_set(first_track, remaining_tracks, set_length - 1)
-
+    dj_set = [first_track]
+    with tqdm(total=set_length - 1, desc="Building DJ set (Dynamic Programming)") as pbar:
+        dj_set += dynamic_dj_set(first_track, remaining_tracks, set_length - 1, pbar)
+    
     return dj_set
 
 
@@ -121,9 +126,9 @@ mutation_rate, and prioritized_rating based on your preferences and desired
 level of complexity.
 '''
 def build_dj_set_genetic(tracks, set_length, min_rating):
-    population_size = 100
-    generations = 500
-    mutation_rate = 0.1
+    population_size = 240
+    generations = 1500
+    mutation_rate = 0.2
     prioritized_rating = min_rating + 1
 
     def fitness(dj_set):
@@ -144,6 +149,17 @@ def build_dj_set_genetic(tracks, set_length, min_rating):
     def crossover(parents):
         crossover_point = random.randint(1, set_length - 1)
         child = parents[0][:crossover_point] + parents[1][crossover_point:]
+        
+        # Ensure there are no duplicate tracks in the child
+        seen_tracks = set()
+        for i, track in enumerate(child):
+            if track not in seen_tracks:
+                seen_tracks.add(track)
+            else:
+                remaining_tracks = set(tracks) - seen_tracks
+                child[i] = random.choice(list(remaining_tracks))
+                seen_tracks.add(child[i])
+
         return child
 
     def mutate(dj_set):
@@ -157,7 +173,7 @@ def build_dj_set_genetic(tracks, set_length, min_rating):
     # Initialize the population with random DJ sets
     population = [random.sample(tracks, set_length) for _ in range(population_size)]
 
-    for _ in range(generations):
+    for generation in tqdm(range(generations), desc="Building DJ set (Genetic Algorithm)"):
         fitnesses = [fitness(dj_set) for dj_set in population]
 
         # Create a new population through selection, crossover, and mutation
@@ -239,5 +255,6 @@ def build_dj_set_simulated_annealing(tracks, set_length, min_rating):
                     best_score = current_score
 
         temperature *= cooling_rate
+        print(temperature)
 
     return best_set
