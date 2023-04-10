@@ -10,7 +10,10 @@ The `generate_set.py` script is a tool for generating a new .m3u8 playlist file 
 
 1.  Clone the repository:
     
-     ```git clone https://github.com/MichelleAppel/AI_set.git cd AI_set```
+     ```
+     git clone https://github.com/MichelleAppel/AI_set.git 
+     cd AI_set
+     ```
     
 -   Prepare the input files:
     
