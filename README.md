@@ -22,7 +22,7 @@ The `generate_set.py` script is a tool for generating a new .m3u8 playlist file 
 -   Run the script:
     
      ```bash
-     python playlist_generator.py --root_folder /path/to/your/folder --indices_file indices.txt
+     python generate_set.py --root_folder /path/to/your/folder --indices_file indices.txt
      ```
     
     Replace `/path/to/your/folder` with the path to the folder containing your original .m3u8 file and `indices.txt` with the name of your indices file.
@@ -43,7 +43,7 @@ my_sets/
 Run the script with the following command:
 
 ```bash
-python playlist_generator.py --root_folder my_sets --indices_file track_indices.txt
+python generate_set.py --root_folder my_sets --indices_file track_indices.txt
 ```
 
 This will generate a new .m3u8 file named `track_indices_playlist.m3u8` in the `my_sets` folder.
