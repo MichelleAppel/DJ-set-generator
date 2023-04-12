@@ -25,28 +25,28 @@ class Track:
         other_key_number, other_key_letter = parse_key(other.key)
 
         number_difference = abs(key_number - other_key_number) % 12
-        # if number_difference == 0:
-        #     number_difference = 12
-
         letter_difference = 0 if key_letter == other_key_letter else 1
 
         if (key_letter == 'A' and other_key_letter == 'B') or (key_letter == 'B' and other_key_letter == 'A'):
             if number_difference in {1, 2}:
-                return 1 - letter_difference
+                score = 1 - letter_difference
             elif number_difference in {11, 10}:
-                return 1 - letter_difference - 0.5
+                score = 1 - letter_difference - 0.5
             else:
-                return 1 - letter_difference - 1
+                score = 1 - letter_difference - 1
+        else:
+            score = 2 - letter_difference - min(number_difference, 12 - number_difference) / 12
 
-        return 2 - letter_difference - min(number_difference, 12 - number_difference) / 12
+        score = max(0, min(1, score))  # Ensure the score is in the range [0, 1]
+
+        return score
 
 
     def bpm_compatibility_score(self, other):
         bpm_difference = abs(self.bpm - other.bpm)
-        max_bpm_diff = 15  # You can adjust this value based on your preference
-
-        if bpm_difference > max_bpm_diff:
-            return 0
+        max_bpm_diff = 10  # You can adjust this value based on your preference
 
         score = 1 - (bpm_difference / max_bpm_diff)
+        score = max(0, min(1, score))  # Ensure the score is in the range [0, 1]
+
         return score

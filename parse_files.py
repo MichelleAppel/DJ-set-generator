@@ -5,28 +5,32 @@ from track import Track
 
 def parse_txt_file(file_path: str) -> List[Track]:
     tracks = []
-    
+
     with open(file_path, "r", encoding="utf-16") as csvfile:
         csvreader = csv.reader(csvfile, delimiter="\t")
-        next(csvreader)  # Skip header line
         
+        # Parse header line to create a mapping of column names to positions
+        header = next(csvreader)
+        col_map = {name.lower(): pos for pos, name in enumerate(header)}
+
         for row in csvreader:
-            index = int(row[0])
-            title = row[2]
-            artist = row[3]
-            album = row[4]
-            genre = row[5]
-            bpm = float(row[6].replace(",", "."))
-            rating = len(row[7].strip()) if row[7].strip() else 0
-            duration = int(row[8][:2]) * 60 + int(row[8][-2:])  # Convert duration to seconds
-            key = row[9]
-            added_date = row[10]
-            bit_depth = int(row[11])
+            index = int(row[col_map['#']])
+            title = row[col_map['titel van muziekstuk']]
+            artist = row[col_map['artiest']]
+            genre = row[col_map['genre']]
+            bpm = float(row[col_map['bpm']].replace(",", "."))
+            rating = len(row[col_map['beoordeling']].strip()) if row[col_map['beoordeling']].strip() else 0
+            duration_str = row[col_map['duur']]
+            duration = int(duration_str[:2]) * 60 + int(duration_str[-2:])  # Convert duration to seconds
+            key = row[col_map['toonsoort']]
+            added_date = row[col_map['datum toegevoegd']]
+            bit_depth = int(row[col_map['bitdiepte']])
 
             track = Track(index, title, artist, genre, bpm, rating, duration, key, added_date, bit_depth, "")
             tracks.append(track)
 
     return tracks
+
 
 def parse_m3u8_file(file_path: str) -> List[str]:
     file_paths = []
