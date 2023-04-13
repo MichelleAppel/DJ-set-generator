@@ -17,8 +17,8 @@ def main():
 
     tracks, track_paths = parse_txt_file(args.playlist_txt_path), parse_m3u8_file(args.playlist_m3u8_path)
     dj_set = build_dj_set(tracks, args.set_length, args.min_rating, args.algorithm)
-    export_to_m3u8(args.output_file, dj_set, track_paths)
-    # print_dj_set(dj_set)
+    # export_to_m3u8(args.output_file, dj_set, track_paths)
+    print_dj_set(dj_set)
 
 if __name__ == "__main__":
     main()

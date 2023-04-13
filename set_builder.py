@@ -1,6 +1,8 @@
 import random
 import math
 
+import itertools
+
 from tqdm import tqdm
 
 def build_dj_set(tracks, set_length, min_rating, algorithm):
@@ -9,117 +11,36 @@ def build_dj_set(tracks, set_length, min_rating, algorithm):
         "dynamic": build_dj_set_dynamic,
         "genetic": build_dj_set_genetic,
         "simulated_annealing": build_dj_set_simulated_annealing,
-        "glued": build_dj_set_glued,
     }
 
     return algorithms[algorithm](tracks, set_length, min_rating)
 
 '''
-Greedy algorithm with randomization: Randomly select a track. Iteratively choose the next track in the set 
-by selecting the track with the highest compatibility score (based on both key and 
-BPM) from a random subset of the remaining tracks. This will create a set that 
-generally follows the key and BPM rules while allowing for some variation and 
-creativity.
+This function first sorts the tracks by their BPM and picks the track with the lowest BPM as the starting point. 
+Then, iteratively, it selects the next track with the highest key compatibility score and closest ascending BPM, 
+and adds it to the set. The process continues until the desired set length is reached or there are no more tracks left.
 '''
-def build_dj_set_greedy(tracks, set_length, min_rating):
-    sorted_tracks = sorted(tracks, key=lambda t: t.bpm)
+def build_dj_set_greedy(tracks, set_length, min_rating=0):
+    tracks = sorted(tracks, key=lambda t: t.bpm)
+    dj_set = [tracks.pop(0)]
 
-    # Separate prioritized tracks and other tracks
-    prioritized_tracks = [track for track in sorted_tracks if track.rating >= min_rating]
-    other_tracks = [track for track in sorted_tracks if track.rating < min_rating]
+    while len(dj_set) < set_length and tracks:
+        best_track = None
+        best_score = -1
 
-    dj_set = []
+        for track in tracks:
+            score = dj_set[-1].key_compatibility_score(track)
+            if score > best_score:
+                best_score = score
+                best_track = track
 
-    # Add the first track (prioritized if available, otherwise the first other track)
-    if prioritized_tracks:
-        dj_set.append(prioritized_tracks.pop(0))
-    elif other_tracks:
-        dj_set.append(other_tracks.pop(0))
-
-    # Fill in the set with prioritized tracks and other tracks
-    while len(dj_set) < set_length and (prioritized_tracks or other_tracks):
-        last_track = dj_set[-1]
-
-        # Compute compatibility scores for prioritized tracks
-        prioritized_compatibility_scores = [
-            (0.6 * last_track.key_compatibility_score(track)) + (0.4 * last_track.bpm_compatibility_score(track))
-            for track in prioritized_tracks
-        ]
-
-        # Compute compatibility scores for other tracks
-        other_compatibility_scores = [
-            (0.6 * last_track.key_compatibility_score(track)) + (0.4 * last_track.bpm_compatibility_score(track))
-            for track in other_tracks
-        ]
-
-        # Find the best matching track
-        if prioritized_compatibility_scores:
-            best_prioritized_track_index = prioritized_compatibility_scores.index(max(prioritized_compatibility_scores))
-            best_track = prioritized_tracks.pop(best_prioritized_track_index)
+        if best_track:
+            dj_set.append(best_track)
+            tracks.remove(best_track)
         else:
-            best_other_track_index = other_compatibility_scores.index(max(other_compatibility_scores))
-            best_track = other_tracks.pop(best_other_track_index)
-
-        # Add the best track to the set
-        dj_set.append(best_track)
-
-    return dj_set
-
-def build_dj_set_glued(tracks, set_length, min_rating, key_importance=0.6, bpm_importance=0.4):
-    sorted_tracks = sorted(tracks, key=lambda t: (t.bpm, t.key))
-
-    # Separate prioritized tracks and other tracks
-    prioritized_tracks = [track for track in sorted_tracks if track.rating >= min_rating]
-    other_tracks = [track for track in sorted_tracks if track.rating < min_rating]
-
-    dj_set = []
-
-    # Iterate through prioritized tracks, and glue them together with the other tracks
-    for i, prioritized_track in enumerate(prioritized_tracks):
-        # Append the prioritized track to the set
-        dj_set.append(prioritized_track)
-
-        # If this is the last prioritized track or the set reaches the desired length, break the loop
-        if i == len(prioritized_tracks) - 1 or len(dj_set) == set_length:
             break
 
-        next_prioritized_track = prioritized_tracks[i + 1]
-
-        # Continue adding glue tracks until the next prioritized track is reached or the set reaches the desired length
-        while len(dj_set) < set_length - 1 and other_tracks:
-            # Compute compatibility scores for the other tracks with both the current and the next prioritized tracks
-            compatibility_scores = [
-                (key_importance * prioritized_track.key_compatibility_score(track) + 
-                 bpm_importance * prioritized_track.bpm_compatibility_score(track)) *
-                (key_importance * next_prioritized_track.key_compatibility_score(track) + 
-                 bpm_importance * next_prioritized_track.bpm_compatibility_score(track))
-                for track in other_tracks
-            ]
-
-            # Find the best matching glue track
-            best_glue_track_index = compatibility_scores.index(max(compatibility_scores))
-            best_glue_track = other_tracks.pop(best_glue_track_index)
-
-            # Append the best glue track to the set
-            dj_set.append(best_glue_track)
-
-            # Check if the best glue track is compatible with the next prioritized track
-            glue_track_next_compatibility = (key_importance * best_glue_track.key_compatibility_score(next_prioritized_track)) + \
-                                             (bpm_importance * best_glue_track.bpm_compatibility_score(next_prioritized_track))
-
-            if glue_track_next_compatibility >= 0.75:
-                break
-
-    # Fill the remaining set slots with other tracks if there is still room
-    while len(dj_set) < set_length and other_tracks:
-        dj_set.append(other_tracks.pop(0))
-
     return dj_set
-
-
-
-
-
 
 
 '''
