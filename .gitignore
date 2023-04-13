@@ -130,3 +130,5 @@ dmypy.json
 
 # Folder
 /sets/
+
+.test.py

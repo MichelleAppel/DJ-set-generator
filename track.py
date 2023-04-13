@@ -17,34 +17,35 @@ class Track:
     
     
     def key_compatibility_score(self, other):
-        def parse_key(key):
-            key_number, key_letter = int(key[:-1]), key[-1]
-            return key_number, key_letter
+        def camelot_to_number(key):
+            number = key[:-1]
+            return int(number)
 
-        key_number, key_letter = parse_key(self.key)
-        other_key_number, other_key_letter = parse_key(other.key)
+        key_a = camelot_to_number(self.key)
+        key_b = camelot_to_number(other.key)
+        key_diff = abs(key_a - key_b) % 12
 
-        number_difference = abs(key_number - other_key_number) % 12
-        letter_difference = 0 if key_letter == other_key_letter else 1
+        if key_diff in (0, 12):  # Same key
+            score = 7
+        elif key_diff in (1, 11):  # One step apart
+            score = 6
+        elif key_diff in (2, 10):  # Two steps apart
+            score = 5
+        elif key_diff in (3, 9):  # Three steps apart
+            score = 4
+        elif key_diff in (4, 8):  # Four steps apart
+            score = 3
+        elif key_diff in (5, 7):  # Five steps apart
+            score = 2
+        else:  # Six steps apart
+            score = 1
 
-        if (key_letter == 'A' and other_key_letter == 'B') or (key_letter == 'B' and other_key_letter == 'A'):
-            if number_difference in {1, 2}:
-                score = 1 - letter_difference
-            elif number_difference in {11, 10}:
-                score = 1 - letter_difference - 0.5
-            else:
-                score = 1 - letter_difference - 1
-        else:
-            score = 2 - letter_difference - min(number_difference, 12 - number_difference) / 12
-
-        score = max(0, min(1, score))  # Ensure the score is in the range [0, 1]
-
-        return score
+        return score / 7  # Normalize the score to be between 0 and 1
 
 
     def bpm_compatibility_score(self, other):
         bpm_difference = abs(self.bpm - other.bpm)
-        max_bpm_diff = 10  # You can adjust this value based on your preference
+        max_bpm_diff = 20  # You can adjust this value based on your preference
 
         score = 1 - (bpm_difference / max_bpm_diff)
         score = max(0, min(1, score))  # Ensure the score is in the range [0, 1]
