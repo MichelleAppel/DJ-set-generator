@@ -11,7 +11,7 @@ def main():
     parser.add_argument("--output_file", type=str, default="output.m3u8", help="Output .m3u8 file")
     parser.add_argument("--set_length", type=int, default=10, help="Length of the DJ set")
     parser.add_argument("--min_rating", type=int, default=0, help="Minimum rating for track priority")
-    parser.add_argument("--algorithm", type=str, choices=["greedy", "glued", "dynamic", "genetic", "simulated_annealing"], default="greedy", help="Algorithm used to build the DJ set")
+    parser.add_argument("--algorithm", type=str, choices=["greedy", "greedy_with_min_rating", "dynamic", "genetic", "simulated_annealing"], default="greedy", help="Algorithm used to build the DJ set")
 
     args = parser.parse_args()
 

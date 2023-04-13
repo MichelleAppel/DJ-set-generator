@@ -8,6 +8,7 @@ from tqdm import tqdm
 def build_dj_set(tracks, set_length, min_rating, algorithm):
     algorithms = {
         "greedy": build_dj_set_greedy,
+        "greedy_with_min_rating": greedy_with_min_rating,
         "dynamic": build_dj_set_dynamic,
         "genetic": build_dj_set_genetic,
         "simulated_annealing": build_dj_set_simulated_annealing,
@@ -37,6 +38,38 @@ def build_dj_set_greedy(tracks, set_length, min_rating=0):
         if best_track:
             dj_set.append(best_track)
             tracks.remove(best_track)
+        else:
+            break
+
+    return dj_set
+
+
+def greedy_with_min_rating(tracks, set_length, min_rating):
+    tracks = sorted(tracks, key=lambda t: t.bpm)
+    top_rated_tracks = [t for t in tracks if t.rating >= min_rating]
+    other_tracks = [t for t in tracks if t.rating < min_rating]
+
+    dj_set = [top_rated_tracks.pop(0)]
+
+    while len(dj_set) < set_length and (top_rated_tracks or other_tracks):
+        best_track = None
+        best_score = -1
+
+        # Search for the best track among top-rated and other tracks combined
+        candidates = top_rated_tracks + other_tracks
+        for track in candidates:
+            score = dj_set[-1].key_compatibility_score(track)
+            if score > best_score:
+                best_score = score
+                best_track = track
+
+        # Add the best track found to the set and remove it from the available tracks
+        if best_track:
+            dj_set.append(best_track)
+            if best_track in top_rated_tracks:
+                top_rated_tracks.remove(best_track)
+            else:
+                other_tracks.remove(best_track)
         else:
             break
 
